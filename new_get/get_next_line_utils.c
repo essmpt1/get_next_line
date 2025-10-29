@@ -6,13 +6,13 @@
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 16:25:27 by malourei          #+#    #+#             */
-/*   Updated: 2025/10/28 00:07:06 by malourei         ###   ########.fr       */
+/*   Updated: 2025/10/29 01:20:14 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *s)
+static int	ft_strlen(char *s)
 {
 	int	i;
 
@@ -24,7 +24,7 @@ int	ft_strlen(char *s)
 	return (i);
 }
 
-void	ft_join(char *dest, char *src, char *stack, int j)
+static void	ft_join(char *dest, char *src, char *stack, int j)
 {
 	int	i;
 	int	n;
@@ -39,7 +39,6 @@ void	ft_join(char *dest, char *src, char *stack, int j)
 			dest[i] = src[i];
 			i++;
 		}
-		//write(1, "Macho\n", 6);
 	}
 	if (src)
 		free(src);
@@ -54,36 +53,60 @@ void	ft_join(char *dest, char *src, char *stack, int j)
 	dest[n + i] = '\0';
 }
 
-void	ft_strcpy(char *dest, char *src)
+static void	free_stack(char *stack)
 {
 	int	i;
-
-	if (!src)
-	{
-		*dest = 0;
-		return ;
-	}
-	i = 0;
-	while (src[i] != 0)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-}
-
-void	ft_strncat(char *dest, char *src, int size)
-{
-	int	i;
+	int	j;
 	int	n;
 
+	if (!*stack)
+		return ;
 	i = 0;
-	n = ft_strlen(dest);
-	while (size > 0)
+	n = 0;
+	j = ft_strlen(stack);
+	while (stack[n] && stack[n] != '\n')
+		n++;
+	if (n == j)
 	{
-		dest[n + i] = src[i];
-		i++;
-		size--;
+		*stack = 0;
+		return ;
 	}
-	dest[n + i] = '\0';
+	stack[n] = 0;
+	n++;
+	while (n < j)
+	{
+		stack[i] = stack[n];
+		n++;
+		i++;
+	}
+	stack[i] = 0;
+}
+
+char	*read_line(char *stack, char *line, char *n)
+{
+	int		j;
+	char	*str;
+
+	j = 0;
+	while (stack[j] && stack[j] != '\n')
+		j++;
+	if (stack[j++] == '\n')
+		*n = '1';
+	str = malloc(sizeof(char) * (j + ft_strlen(line) + 1));
+	if (!str)
+		return (NULL);
+	ft_join(str, line, stack, j);
+	free_stack(stack);
+	return (str);
+}
+
+char	*ft_check_erro(char *stack, int i, char *line)
+{
+	if (*stack && i < 0)
+	{
+		if (*stack)
+			*stack = 0;
+		return (line);
+	}
+	return (line);
 }
