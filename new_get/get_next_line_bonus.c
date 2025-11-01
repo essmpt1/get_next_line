@@ -1,57 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/10 16:25:27 by malourei          #+#    #+#             */
-/*   Updated: 2025/11/01 23:20:04 by malourei         ###   ########.fr       */
+/*   Created: 2024/05/20 13:41:21 by malourei          #+#    #+#             */
+/*   Updated: 2025/10/31 00:01:08 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-
-static int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	if (s == NULL)
-		return (0);
-	while (s[i])
-		i++;
-	return (i);
-}
-
-static void	ft_join(char *dest, char *src, char *stack, int j)
-{
-	int	i;
-	int	n;
-
-	i = 0;
-	if (!src)
-		*dest = 0;
-	else
-	{
-		while (src[i] != 0)
-		{
-			dest[i] = src[i];
-			i++;
-		}
-	}
-	if (src)
-		free(src);
-	n = i;
-	i = 0;
-	while (j > 0)
-	{
-		dest[n + i] = stack[i];
-		i++;
-		j--;
-	}
-	dest[n + i] = '\0';
-}
+#include "get_next_line_bonus.h"
 
 static void	free_stack(char *stack)
 {
@@ -82,7 +41,7 @@ static void	free_stack(char *stack)
 	stack[i] = 0;
 }
 
-char	*read_line(char *stack, char *line, char *n)
+static char	*read_line(char stack[], char *line, char *n)
 {
 	int		j;
 	char	*str;
@@ -90,7 +49,7 @@ char	*read_line(char *stack, char *line, char *n)
 	j = 0;
 	while (stack[j] && stack[j] != '\n')
 		j++;
-	if (stack[j] == '\n' )
+	if (stack[j] == '\n')
 	{
 		*n = '1';
 		j++;
@@ -103,7 +62,7 @@ char	*read_line(char *stack, char *line, char *n)
 	return (str);
 }
 
-char	*ft_check_erro(char *stack, int i, char *line)
+static char	*ft_check_erro(char *stack, int i, char *line)
 {
 	if (i < 0)
 	{
@@ -112,6 +71,34 @@ char	*ft_check_erro(char *stack, int i, char *line)
 		if (line)
 			free(line);
 		return (NULL);
+	}
+	return (line);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	stack[FD_MAX][BUFFER_SIZE + 1];
+	char		*line;
+	char		n;
+	int			i;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FOPEN_MAX)
+		return (NULL);
+	i = 0;
+	line = NULL;
+	n = 0;
+	while (!n)
+	{
+		if (!*stack[fd])
+		{
+			i = read(fd, stack[fd], BUFFER_SIZE);
+			if (i <= 0)
+				return (ft_check_erro(stack[fd], i, line));
+			stack[fd][i] = 0;
+		}
+		line = read_line(stack[fd], line, &n);
+		if (!line)
+			return (NULL);
 	}
 	return (line);
 }

@@ -6,7 +6,7 @@
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 13:41:21 by malourei          #+#    #+#             */
-/*   Updated: 2025/10/29 01:34:03 by malourei         ###   ########.fr       */
+/*   Updated: 2025/11/01 23:21:51 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ char	*get_next_line(int fd)
 			stack[i] = 0;
 		}
 		line = read_line(stack, line, &n);
+		if (!line)
+			return (NULL);
 	}
 	return (line);
 }
