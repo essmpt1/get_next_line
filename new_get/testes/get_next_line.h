@@ -6,7 +6,7 @@
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 16:24:46 by malourei          #+#    #+#             */
-/*   Updated: 2025/10/29 01:20:20 by malourei         ###   ########.fr       */
+/*   Updated: 2025/11/01 23:47:04 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # include <stdlib.h>
 # include <limits.h>
 
-char	*ft_check_erro(char *stack, int i, char *line);
-char	*read_line(char *stack, char *line, char *n);
+char	*ft_check_erro(char *stack, int i, char *line, int *stack_len);
+char	*read_line(char *stack, int *stack_len, char *line, char *n);
 char	*get_next_line(int fd);
 
 #endif

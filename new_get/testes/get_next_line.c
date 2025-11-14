@@ -6,7 +6,7 @@
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 13:41:21 by malourei          #+#    #+#             */
-/*   Updated: 2025/11/01 23:21:51 by malourei         ###   ########.fr       */
+/*   Updated: 2025/11/01 23:55:36 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 char	*get_next_line(int fd)
 {
 	static char	stack[BUFFER_SIZE + 1];
+	static int	stack_len;
 	char		*line;
 	char		n;
 	int			i;
@@ -24,16 +25,17 @@ char	*get_next_line(int fd)
 	i = 0;
 	line = NULL;
 	n = 0;
+	//stack_len = 0;
 	while (!n)
 	{
-		if (!*stack)
+		if (stack_len == 0)
 		{
 			i = read(fd, stack, BUFFER_SIZE);
 			if (i <= 0)
-				return (ft_check_erro(stack, i, line));
-			stack[i] = 0;
+				return (ft_check_erro(stack, i, line, &stack_len));
+			stack_len = i;
 		}
-		line = read_line(stack, line, &n);
+		line = read_line(stack, &stack_len, line, &n);
 		if (!line)
 			return (NULL);
 	}

@@ -6,7 +6,7 @@
 /*   By: malourei <malourei@student.42lisboa.pt>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 16:25:27 by malourei          #+#    #+#             */
-/*   Updated: 2025/11/01 23:20:04 by malourei         ###   ########.fr       */
+/*   Updated: 2025/11/02 00:02:31 by malourei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,87 +28,89 @@ static void	ft_join(char *dest, char *src, char *stack, int j)
 {
 	int	i;
 	int	n;
+	int	src_len;
 
 	i = 0;
-	if (!src)
-		*dest = 0;
-	else
-	{
-		while (src[i] != 0)
-		{
-			dest[i] = src[i];
-			i++;
-		}
-	}
+	src_len = 0;
 	if (src)
-		free(src);
+	{
+		// copia tudo, até ao terminador nulo incluído
+		while (src[src_len])
+			src_len++;
+	}
+
+	// copia src
+	while (i < src_len)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+
+	free(src);
 	n = i;
 	i = 0;
-	while (j > 0)
+
+	// copia j bytes da stack (pode conter \0)
+	while (i < j)
 	{
 		dest[n + i] = stack[i];
 		i++;
-		j--;
 	}
 	dest[n + i] = '\0';
 }
 
-static void	free_stack(char *stack)
+static void	free_stack(char *stack, int *stack_len, int consumed)
 {
-	int	i;
-	int	j;
-	int	n;
+	int	i = 0;
 
-	if (!*stack)
-		return ;
-	i = 0;
-	n = 0;
-	j = ft_strlen(stack);
-	while (stack[n] && stack[n] != '\n')
-		n++;
-	if (n == j)
+	if (consumed >= *stack_len)
 	{
-		*stack = 0;
+		*stack_len = 0;
 		return ;
 	}
-	stack[n] = 0;
-	n++;
-	while (n < j)
+	while (consumed + i < *stack_len)
 	{
-		stack[i] = stack[n];
-		n++;
+		stack[i] = stack[consumed + i];
 		i++;
 	}
-	stack[i] = 0;
+	*stack_len = i;
 }
 
-char	*read_line(char *stack, char *line, char *n)
+char	*read_line(char *stack, int *stack_len, char *line, char *n)
 {
 	int		j;
 	char	*str;
+	int		line_len;
 
 	j = 0;
-	while (stack[j] && stack[j] != '\n')
+	// percorre o buffer até encontrar '\n' ou chegar ao limite de bytes válidos
+	while (j < *stack_len && stack[j] != '\n')
 		j++;
-	if (stack[j] == '\n' )
+
+	// se encontrou newline, marcar fim da linha e consumir +1 byte
+	if (j < *stack_len && stack[j] == '\n')
 	{
 		*n = '1';
 		j++;
 	}
-	str = malloc(sizeof(char) * (j + ft_strlen(line) + 1));
+
+	line_len = ft_strlen(line);
+	str = malloc(sizeof(char) * (line_len + j + 1));
 	if (!str)
 		return (NULL);
+
 	ft_join(str, line, stack, j);
-	free_stack(stack);
+	free_stack(stack, stack_len, j);
+
 	return (str);
 }
 
-char	*ft_check_erro(char *stack, int i, char *line)
+char	*ft_check_erro(char *stack, int i, char *line, int *stack_len)
 {
+	(void)stack;
 	if (i < 0)
 	{
-		if (*stack)
-			*stack = 0;
+		*stack_len = 0;
 		if (line)
 			free(line);
 		return (NULL);
